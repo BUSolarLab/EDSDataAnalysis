@@ -3,6 +3,15 @@ from PIL import ImageTk, Image
 from tkinter import filedialog
 from tkintertable import TableCanvas, TableModel
 import sqlite3
+import pandas as pd
+import numpy as np
+import math
+import datetime
+from manual_functions import get_avg_manual_data
+
+# constants
+manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'EDS_PR_Before', 'EDS_PR_After', 'EDS_SR_Before', 'EDS_SR_After']
+
 
 root = Tk()
 root.title("EDS Data Analysis Tool")
@@ -65,10 +74,11 @@ tframe.grid(row=2, column=0, columnspan=3, padx=10,pady=20)
 
 # insert the csv table
 table = TableCanvas(tframe)
-#table.cols=8
 table.thefont = ('Arial',9)
 filename = 'manual_data.csv'
-table.importCSV(filename)
-
+man_df = get_avg_manual_data(manual_cols_list, 10)
+x = man_df.to_csv("manual_sorted.csv")
+table.importCSV("manual_sorted.csv")
+table.show()
 
 root.mainloop()
