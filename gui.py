@@ -1,11 +1,12 @@
 from tkinter import *
 from PIL import ImageTk, Image
 from tkinter import filedialog
+from tkintertable import TableCanvas, TableModel
 import sqlite3
 
 root = Tk()
 root.title("EDS Data Analysis Tool")
-root.geometry("850x500")
+root.geometry("950x500")
 #root.configure(background="white")
 
 # function to get csv file path
@@ -38,8 +39,8 @@ def find_file():
 
 # labels for Application Title
 title_label = Label(root, text="EDS DATA ANALYSIS TOOL", font=("Helvetica", 18))
-title_label.grid(row=0, column=3, padx=10, pady=10)
-bu_label = Label(root, text="BOSTON UNIVERSITY", font=("Arial", 10))
+title_label.grid(row=0, column=3, padx=10, pady=15)
+bu_label = Label(root, text="BOSTON UNIVERSITY", font=("Arial", 12))
 bu_label.grid(row=1, column=3, padx=10)
 
 # labels for showing testing/manual/noon moode
@@ -57,6 +58,17 @@ file_btn.grid(row=0,column=0, padx=10, pady=10)
 # entry field to display path for data csv file
 file_entry = Entry(root, width=45)
 file_entry.grid(row=0, column=1, columnspan=2)
+
+# create frame for the table
+tframe = Frame(root)
+tframe.grid(row=2, column=0, columnspan=3, padx=10,pady=20)
+
+# insert the csv table
+table = TableCanvas(tframe)
+#table.cols=8
+table.thefont = ('Arial',9)
+filename = 'manual_data.csv'
+table.importCSV(filename)
 
 
 root.mainloop()
