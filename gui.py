@@ -34,6 +34,7 @@ def find_file():
     # insert the path to the entry field
     file_entry.insert(0, root.filename)
     # based on path, figure out which mode
+    global mode
     mode = root.filename.split("/")[-1]
     if mode == 'manual_data.csv':
         manual_label = Label(root, text="Manual Data", borderwidth=1.4, relief="solid", width=20, height=3, bg="green")
@@ -45,12 +46,34 @@ def find_file():
         noon_label = Label(root, text="Noon Data", borderwidth=1.4, relief="solid", width=20, height=3, bg="green")
         noon_label.grid(row=1, column=2)
 
+# function to update the table
+def get_table():
+    # get the average day number
+    global window
+    window = avg_entry.get()
+    # check which mode selected
+    if mode == 'manual_data.csv':
+        man_df = get_avg_manual_data(manual_cols_list, int(window))
+        x = man_df.to_csv("manual_sorted.csv")
+        table.importCSV("manual_sorted.csv")
+    # clear the entry field
+    avg_entry.delete(0, END)
 
 # labels for Application Title
 title_label = Label(root, text="EDS DATA ANALYSIS TOOL", font=("Helvetica", 18))
 title_label.grid(row=0, column=3, padx=10, pady=15)
 bu_label = Label(root, text="BOSTON UNIVERSITY", font=("Arial", 12))
 bu_label.grid(row=1, column=3, padx=10)
+
+# instructions label
+ins_label = Label(root, text="How To Use:",font=("Arial", 11) )
+ins_label.grid(row=2, column=3,padx=15, pady=60, sticky=W+N)
+ins1_label = Label(root, text=" 1. Select the CSV File",font=("Arial", 10))
+ins1_label.grid(row=2, column=3, padx=15, pady=90, sticky=W+N)
+ins2_label = Label(root, text=" 2. Select the average days to sort the data",font=("Arial", 10))
+ins2_label.grid(row=2, column=3, padx=15, pady=120, sticky=W+N)
+ins3_label = Label(root, text=" 3. Observe result or plot",font=("Arial", 10))
+ins3_label.grid(row=2, column=3, padx=15, pady=150, sticky=W+N)
 
 # labels for showing testing/manual/noon moode
 testing_label = Label(root, text="Testing Data", borderwidth=1.4, relief="solid", width=20, height=3)
@@ -68,6 +91,18 @@ file_btn.grid(row=0,column=0, padx=10, pady=10)
 file_entry = Entry(root, width=45)
 file_entry.grid(row=0, column=1, columnspan=2)
 
+# label to get average day input
+avg_label = Label(root, text="Average Days: ",font=("Arial", 11))
+avg_label.grid(row=2, column=3, padx=15, pady=21, sticky=W+N)
+
+# entry field for average day input
+avg_entry = Entry(root, width= 35)
+avg_entry.grid(row=2, column=3,pady=22, sticky=N+E)
+
+# create button to update the table
+table_btn = Button(root, text="Get Table", command=get_table, borderwidth=1.4, relief="solid", width=20, height=3)
+table_btn.grid(row=2, column=3, padx=15, pady=100, sticky=W+S)
+
 # create frame for the table
 tframe = Frame(root)
 tframe.grid(row=2, column=0, columnspan=3, padx=10,pady=20)
@@ -75,10 +110,13 @@ tframe.grid(row=2, column=0, columnspan=3, padx=10,pady=20)
 # insert the csv table
 table = TableCanvas(tframe)
 table.thefont = ('Arial',9)
-filename = 'manual_data.csv'
+table.show()
+'''
 man_df = get_avg_manual_data(manual_cols_list, 10)
 x = man_df.to_csv("manual_sorted.csv")
 table.importCSV("manual_sorted.csv")
 table.show()
+'''
+
 
 root.mainloop()
