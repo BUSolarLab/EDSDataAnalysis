@@ -8,14 +8,19 @@ import numpy as np
 import math
 import datetime
 from manual_functions import get_avg_manual_data
+from noon_functions import get_avg_noon_data
+from testing_functions import get_avg_testing_data
 
 # constants
 manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'EDS_PR_Before', 'EDS_PR_After', 'EDS_SR_Before', 'EDS_SR_After']
-
+noon_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV(V)', 'SCC(A)', 'Power(W)', 'PR', 'SR']
+testing_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'CTRL1_OCV(V)', 'CTRL1_SCC(A)', 'CTRL2_OCV(V)', 'CTRL2_SCC(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'CTRL1_PWR(W)', 'CTRL2_PWR(W)']
 
 root = Tk()
 root.title("EDS Data Analysis Tool")
-root.geometry("950x550")
+root.geometry("1100x550")
+#root.grid_columnconfigure(1,weight=1)
+#root.grid_rowconfigure(1,weight=1)
 #root.configure(background="white")
 
 # function to get csv file path
@@ -56,6 +61,14 @@ def get_table():
         man_df = get_avg_manual_data(manual_cols_list, int(window))
         x = man_df.to_csv("manual_sorted.csv")
         table.importCSV("manual_sorted.csv")
+    elif mode == "noon_data.csv":
+        man_df = get_avg_noon_data(noon_cols_list, int(window))
+        x = man_df.to_csv("noon_sorted.csv")
+        table.importCSV("noon_sorted.csv")
+    elif mode == "testing_data.csv":
+        man_df = get_avg_testing_data(testing_cols_list, int(window))
+        x = man_df.to_csv("testing_sorted.csv")
+        table.importCSV("testing_sorted.csv")
     # clear the entry field
     avg_entry.delete(0, END)
 
