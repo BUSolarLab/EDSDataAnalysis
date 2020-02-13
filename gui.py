@@ -15,7 +15,7 @@ manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V
 
 root = Tk()
 root.title("EDS Data Analysis Tool")
-root.geometry("950x500")
+root.geometry("950x550")
 #root.configure(background="white")
 
 # function to get csv file path
