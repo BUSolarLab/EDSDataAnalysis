@@ -13,8 +13,9 @@ from testing_functions import get_avg_testing_data
 import matplotlib.pyplot as plt
 
 # global variables
-global soiling_rate
+global soiling_rate, viewer
 soiling_rate = ""
+viewer = 0
 
 # header constants for the csv files
 manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'EDS_PR_Before', 'EDS_PR_After', 'EDS_SR_Before', 'EDS_SR_After']
@@ -62,10 +63,13 @@ def find_file():
     mode = root.filename.split("/")[-1]
     if mode == 'manual_data.csv':
         manual_label.config(bg="green")
+        rem_noon_viewer_btn()
     elif mode == 'testing_data.csv':
         testing_label.config(bg="green")
+        rem_noon_viewer_btn()
     elif mode == 'noon_data.csv':
         noon_label.config(bg="green")
+        show_noon_viewer_btn()
 
 # load sorted ata
 def load_sorted(name):
@@ -91,13 +95,14 @@ def calc_soiling_rate(mode):
         soiling_rate_before = stats.theilslopes(sr_before, range(len(sr_before)), 0.90)[0].round(2)
         soiling_rate_after = stats.theilslopes(sr_after, range(len(sr_after)), 0.90)[0].round(2)
         # update the soiling rate value
-        sr_label.config(text= "Soiling Rates: " + str(soiling_rate_before) + "% (before), " + str(soiling_rate_after) + "% (after)")
+        sr_label.config(text= "Soiling Rates: " + str(soiling_rate_before) + "% (Pre), " + str(soiling_rate_after) + "% (Post)")
     elif mode == 'noon_data.csv':
         # get the file to find the soiling rate
         output = output_loc+"/noon_sorted.csv"
         df = load_sorted(output)
-        # declare soiling rate dictionary
-        soiling_rates = {
+        labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
+        # declare soiling ratio dictionary
+        soiling_ratios = {
             'EDS1_PRE':[],
             'EDS2_PRE':[],
             'EDS3_PRE':[],
@@ -114,12 +119,66 @@ def calc_soiling_rate(mode):
             'CTRL2_POST':[],
         }
         # get the soiling ratio values
-        sr = df['SR']
+        counter = 0
+        for x in df['SR']:
+            if counter == 14:
+                counter = 0
+                soiling_ratios[labels[counter]].append(x)
+                counter = counter + 1
+            else:
+                soiling_ratios[labels[counter]].append(x)
+                counter = counter + 1
+        # declare soiling rate dictionary
+        soiling_rates = {
+            'EDS1_PRE':0,
+            'EDS2_PRE':0,
+            'EDS3_PRE':0,
+            'EDS4_PRE':0,
+            'EDS5_PRE':0,
+            'CTRL1_PRE':0,
+            'CTRL2_PRE':0,
+            'EDS1_POST':0,
+            'EDS2_POST':0,
+            'EDS3_POST':0,
+            'EDS4_POST':0,
+            'EDS5_POST':0,
+            'CTRL1_POST':0,
+            'CTRL2_POST':0,
+        }
         # calculate the soiling rate values
-        soiling_rate = stats.theilslopes(sr, range(len(sr)), 0.90)[0].round(2)
+        for y in labels:
+            soiling_rates[y] = stats.theilslopes(soiling_ratios[y], range(len(soiling_ratios[y])), 0.90)[0].round(2)
+        # find which panel to display
+        if viewer == 0:
+            name = 'EDS1'
+            sr_out_pre = soiling_rates['EDS1_PRE']
+            sr_out_post = soiling_rates['EDS1_POST']
+        elif viewer == 1:
+            name = 'EDS2'
+            sr_out_pre = soiling_rates['EDS2_PRE']
+            sr_out_post = soiling_rates['EDS2_POST']
+        elif viewer == 2:
+            name = 'EDS3'
+            sr_out_pre = soiling_rates['EDS3_PRE']
+            sr_out_post = soiling_rates['EDS3_POST']
+        elif viewer == 3:
+            name = 'EDS4'
+            sr_out_pre = soiling_rates['EDS4_PRE']
+            sr_out_post = soiling_rates['EDS4_POST']
+        elif viewer == 4:
+            name = 'EDS5'
+            sr_out_pre = soiling_rates['EDS5_PRE']
+            sr_out_post = soiling_rates['EDS5_POST']
+        elif viewer == 5:
+            name = 'CTRL1'
+            sr_out_pre = soiling_rates['CTRL1_PRE']
+            sr_out_post = soiling_rates['CTRL1_POST']
+        elif viewer == 6:
+            name = 'CTRL2'
+            sr_out_pre = soiling_rates['CTRL2_PRE']
+            sr_out_post = soiling_rates['CTRL2_POST']
         # update the soiling rate value
-        sr_label.config(text= "Soiling Rate: " + str(soiling_rate) + " %")
-        '''INCOMPLETE'''
+        sr_label.config(text= name + " Soiling Rates: " + str(sr_out_pre) + "% (Pre), " + str(sr_out_post) + "% (Post)")
     elif mode == 'testing_data.csv':
         # update the soiling rate value
         sr_label.config(text= "Soiling Rate: N/A (This mode does not measure SR)")
@@ -223,6 +282,34 @@ def plot_table():
         # error message since no plotting for testing data
         error_label.config(text="Error! No Plotting Feature for Testing Data")
 
+def next(x):
+    global viewer
+    viewer = x + 1
+    if viewer == 6:
+        next_btn.config(state='disabled')
+    else:
+        next_btn.config(state=NORMAL)
+        prev_btn.config(state=NORMAL)
+    calc_soiling_rate(mode)
+
+def prev(x):
+    global viewer
+    viewer = x - 1
+    if viewer == 0:
+        prev_btn.config(state='disabled')
+    else:
+        prev_btn.config(state=NORMAL)
+        next_btn.config(state=NORMAL)
+    calc_soiling_rate(mode)
+
+def show_noon_viewer_btn():
+    next_btn.grid(row=2, column=2, padx=10, pady=208, sticky=S+E)
+    prev_btn.grid(row=2, column=0, padx=12, pady=208, sticky=S+W)
+
+def rem_noon_viewer_btn():
+    next_btn.grid_forget()
+    prev_btn.grid_forget()
+
 # labels for Application Title
 title_label = Label(root, text="EDS DATA ANALYSIS TOOL", font=("Helvetica", 20))
 title_label.grid(row=0, column=3, padx=10,pady=15, sticky=W)
@@ -259,7 +346,11 @@ file_entry.grid(row=0, column=1, columnspan=2, padx=2, sticky=W)
 
 # label to display soiling rate
 sr_label = Label(root, text="Soiling Rate: "+soiling_rate+" %")
-sr_label.grid(row=2, column=0, columnspan=3, pady=213, sticky=S)
+sr_label.grid(row=2, column=0, columnspan=3, pady=209, sticky=S)
+
+# buttons for changing soiling rate in noon mode
+next_btn = Button(root, text=">>", command=lambda: next(viewer))
+prev_btn = Button(root, text="<<", state=DISABLED, command=lambda: prev(viewer))
 
 # create label for output path
 out_btn = Button(root, text="Select Output Location", command=select_output, borderwidth=2, relief="raised")
