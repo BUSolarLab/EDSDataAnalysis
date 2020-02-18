@@ -13,9 +13,8 @@ from testing_functions import get_avg_testing_data
 import matplotlib.pyplot as plt
 
 # global variables
-global soiling_rate, viewer
+global soiling_rate
 soiling_rate = ""
-viewer = 0
 
 # header constants for the csv files
 manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'EDS_PR_Before', 'EDS_PR_After', 'EDS_SR_Before', 'EDS_SR_After']
@@ -63,13 +62,10 @@ def find_file():
     mode = root.filename.split("/")[-1]
     if mode == 'manual_data.csv':
         manual_label.config(bg="green")
-        rem_noon_viewer_btn()
     elif mode == 'testing_data.csv':
         testing_label.config(bg="green")
-        rem_noon_viewer_btn()
     elif mode == 'noon_data.csv':
         noon_label.config(bg="green")
-        show_noon_viewer_btn()
 
 # load sorted ata
 def load_sorted(name):
@@ -80,6 +76,31 @@ def load_sorted(name):
     # remove all NaN entries
     df.drop(df.filter(regex="Unname"),axis=1, inplace=True)
     return df
+
+# show the soiling rates in new window
+def show_sr():
+    # new window for soiling rate data
+    sr_window = Toplevel()
+    sr_window.geometry("300x400")
+    sr_title = Label(sr_window, text="Soiling Rate Values:", font=("Arial", 15)).pack()
+    if mode ==  'manual_data.csv':
+        pre,post = calc_soiling_rate(mode)
+        message = "EDS1 Soiling Rate: " + pre + "%(PRE), " + post + "%(POST)"
+        sr_contents = Label(sr_window, text=message).pack()
+    elif mode == 'noon_data.csv':
+        labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
+        data = calc_soiling_rate(mode)
+        # prepare the label message
+        eds1 = "EDS1 Soiling Rate: " + str(data['EDS1_PRE']) + "%(PRE), " + str(data['EDS1_POST']) + "%(POST)"
+        eds2 = "EDS2 Soiling Rate: " + str(data['EDS2_PRE']) + "%(PRE), " + str(data['EDS2_POST']) + "%(POST)"
+        eds3 = "EDS3 Soiling Rate: " + str(data['EDS3_PRE']) + "%(PRE), " + str(data['EDS3_POST']) + "%(POST)"
+        eds4 = "EDS4 Soiling Rate: " + str(data['EDS4_PRE']) + "%(PRE), " + str(data['EDS4_POST']) + "%(POST)"
+        eds5 = "EDS5 Soiling Rate: " + str(data['EDS5_PRE']) + "%(PRE), " + str(data['EDS5_POST']) + "%(POST)"
+        ctrl1 = "CTRL1 Soiling Rate: " + str(data['CTRL1_PRE']) + "%(PRE), " + str(data['CTRL1_POST']) + "%(POST)"
+        ctrl2 = "CTRL2 Soiling Rate: " + str(data['CTRL2_PRE']) + "%(PRE), " + str(data['CTRL2_POST']) + "%(POST)"
+        message = eds1 + '\n' + eds2 + '\n' + eds3 + '\n' + eds4 + '\n' + eds5 + '\n' + ctrl1 + '\n' + ctrl2
+        # display the message
+        sr_contents = Label(sr_window, text=message).pack()
 
 # function to calculate the soiling rate of the table's data
 def calc_soiling_rate(mode):
@@ -94,8 +115,8 @@ def calc_soiling_rate(mode):
         # calculate the soiling rate values
         soiling_rate_before = stats.theilslopes(sr_before, range(len(sr_before)), 0.90)[0].round(2)
         soiling_rate_after = stats.theilslopes(sr_after, range(len(sr_after)), 0.90)[0].round(2)
-        # update the soiling rate value
-        sr_label.config(text= "Soiling Rates: " + str(soiling_rate_before) + "% (Pre), " + str(soiling_rate_after) + "% (Post)")
+        # return the soiling rates
+        return (str(soiling_rate_before), str(soiling_rate_after))
     elif mode == 'noon_data.csv':
         # get the file to find the soiling rate
         output = output_loc+"/noon_sorted.csv"
@@ -148,37 +169,8 @@ def calc_soiling_rate(mode):
         # calculate the soiling rate values
         for y in labels:
             soiling_rates[y] = stats.theilslopes(soiling_ratios[y], range(len(soiling_ratios[y])), 0.90)[0].round(2)
-        # find which panel to display
-        if viewer == 0:
-            name = 'EDS1'
-            sr_out_pre = soiling_rates['EDS1_PRE']
-            sr_out_post = soiling_rates['EDS1_POST']
-        elif viewer == 1:
-            name = 'EDS2'
-            sr_out_pre = soiling_rates['EDS2_PRE']
-            sr_out_post = soiling_rates['EDS2_POST']
-        elif viewer == 2:
-            name = 'EDS3'
-            sr_out_pre = soiling_rates['EDS3_PRE']
-            sr_out_post = soiling_rates['EDS3_POST']
-        elif viewer == 3:
-            name = 'EDS4'
-            sr_out_pre = soiling_rates['EDS4_PRE']
-            sr_out_post = soiling_rates['EDS4_POST']
-        elif viewer == 4:
-            name = 'EDS5'
-            sr_out_pre = soiling_rates['EDS5_PRE']
-            sr_out_post = soiling_rates['EDS5_POST']
-        elif viewer == 5:
-            name = 'CTRL1'
-            sr_out_pre = soiling_rates['CTRL1_PRE']
-            sr_out_post = soiling_rates['CTRL1_POST']
-        elif viewer == 6:
-            name = 'CTRL2'
-            sr_out_pre = soiling_rates['CTRL2_PRE']
-            sr_out_post = soiling_rates['CTRL2_POST']
-        # update the soiling rate value
-        sr_label.config(text= name + " Soiling Rates: " + str(sr_out_pre) + "% (Pre), " + str(sr_out_post) + "% (Post)")
+        # return the dictionary
+        return soiling_rates
     elif mode == 'testing_data.csv':
         # update the soiling rate value
         sr_label.config(text= "Soiling Rate: N/A (This mode does not measure SR)")
@@ -195,28 +187,22 @@ def get_table():
         man_df = get_avg_manual_data(manual_cols_list, int(window))
         output = output_loc+"/manual_sorted.csv"
         x = man_df.to_csv(output)
-        # update the soiling rate value
-        calc_soiling_rate(mode)
         # upload csv to the table
         table.importCSV(output)
     elif mode == "noon_data.csv":
         man_df = get_avg_noon_data(noon_cols_list, int(window))
         output = output_loc+"/noon_sorted.csv"
         x = man_df.to_csv(output)
-        # update the soiling rate value
-        calc_soiling_rate(mode)
         # upload csv to the table
         table.importCSV(output)
     elif mode == "testing_data.csv":
         man_df = get_avg_testing_data(testing_cols_list, int(window))
         output = output_loc+"/testing_sorted.csv"
         x = man_df.to_csv(output)
-        # update the soiling rate value
-        calc_soiling_rate(mode)
         # upload csv to the table
         table.importCSV(output)
     # clear the entry field
-    avg_entry.delete(0, END)
+    #avg_entry.delete(0, END)
 
 # plot the table
 def plot_table():
@@ -266,49 +252,137 @@ def plot_table():
             plt.show()
 
     elif mode == "noon_data.csv":
-        # get the file to find the soiling rate
+        # get the file location and declare constants
         output = output_loc+"/noon_sorted.csv"
         df = load_sorted(output)
-        # get desired columns names to plot
+        labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
         cols = ['SCC(A)', 'Power(W)', 'PR', 'SR']
-        # get the desired column data from the table
+        # declare dictionary to store data, each metric has 2 lists, one for pre and post data
         data = {
-            'SCC(A)':[],
-            'Power(W)':[],
-            'PR':[],
-            'SR':[]
+            'EDS1':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'EDS2':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'EDS3':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'EDS4':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'EDS5':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'CTRL1':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            },
+            'CTRL2':{
+                'SCC(A)':[[],[]],
+                'Power(W)':[[],[]],
+                'PR':[[],[]],
+                'SR':[[],[]]
+            }
         }
+        # get the data
+        counter = 0
+        for x in cols:
+            for y in df[x]:
+                if counter == 0:
+                    data['EDS1'][x][0].append(y)
+                    counter += 1
+                elif counter == 1:
+                    data['EDS2'][x][0].append(y)
+                    counter += 1
+                elif counter == 2:
+                    data['EDS3'][x][0].append(y)
+                    counter += 1
+                elif counter == 3:
+                    data['EDS4'][x][0].append(y)
+                    counter += 1
+                elif counter == 4:
+                    data['EDS5'][x][0].append(y)
+                    counter += 1
+                elif counter == 5:
+                    data['CTRL1'][x][0].append(y)
+                    counter += 1
+                elif counter == 6:
+                    data['CTRL2'][x][0].append(y)
+                    counter += 1
+                elif counter == 7:
+                    data['EDS1'][x][1].append(y)
+                    counter += 1
+                elif counter == 8:
+                    data['EDS2'][x][1].append(y)
+                    counter += 1
+                elif counter == 9:
+                    data['EDS3'][x][1].append(y)
+                    counter += 1
+                elif counter == 10:
+                    data['EDS4'][x][1].append(y)
+                    counter += 1
+                elif counter == 11:
+                    data['EDS5'][x][1].append(y)
+                    counter += 1
+                elif counter == 12:
+                    data['CTRL1'][x][1].append(y)
+                    counter += 1
+                elif counter == 13:
+                    data['CTRL2'][x][1].append(y)
+                    counter = 0
+        # plot the data
+        plt.figure(figsize=(12, 6))
+        panels = ['EDS1', 'EDS2', 'EDS3', 'EDS4', 'EDS5', 'CTRL1', 'CTRL2']
+        if plot_mode.get() == 'Isc':
+            counter = 0
+            for x in range(7):
+                plt.subplot(4,2,x+1)
+                plt.scatter(range(len(data[panels[x]]['SCC(A)'][0])),data[panels[x]]['SCC(A)'][0])
+                plt.scatter(range(len(data[panels[x]]['SCC(A)'][1])),data[panels[x]]['SCC(A)'][1])
+            plt.tight_layout(1)
+            plt.show()
+        elif plot_mode.get() == 'Power':
+            for x in range(7):
+                plt.subplot(2,4,x+1)
+                plt.scatter(range(len(data[panels[x]]['Power(W)'][0])),data[panels[x]]['Power(W)'][0])
+                plt.scatter(range(len(data[panels[x]]['Power(W)'][1])),data[panels[x]]['Power(W)'][1])
+            plt.tight_layout(1)
+            plt.show()
+        elif plot_mode.get() == 'PR':
+            for x in range(7):
+                plt.subplot(3,3,x+1)
+                plt.scatter(range(len(data[panels[x]]['PR'][0])),data[panels[x]]['PR'][0])
+                plt.scatter(range(len(data[panels[x]]['PR'][1])),data[panels[x]]['PR'][1])
+            plt.tight_layout(1)
+            plt.show()
+        elif plot_mode.get() == 'SR':
+            for x in range(7):
+                plt.subplot(3,3,x+1)
+                plt.scatter(range(len(data[panels[x]]['SR'][0])),data[panels[x]]['SR'][0])
+                plt.scatter(range(len(data[panels[x]]['SR'][1])),data[panels[x]]['SR'][1])
+            plt.tight_layout(1)
+            plt.show()
     elif mode == "testing_data.csv":
         # error message since no plotting for testing data
         error_label.config(text="Error! No Plotting Feature for Testing Data")
-
-def next(x):
-    global viewer
-    viewer = x + 1
-    if viewer == 6:
-        next_btn.config(state='disabled')
-    else:
-        next_btn.config(state=NORMAL)
-        prev_btn.config(state=NORMAL)
-    calc_soiling_rate(mode)
-
-def prev(x):
-    global viewer
-    viewer = x - 1
-    if viewer == 0:
-        prev_btn.config(state='disabled')
-    else:
-        prev_btn.config(state=NORMAL)
-        next_btn.config(state=NORMAL)
-    calc_soiling_rate(mode)
-
-def show_noon_viewer_btn():
-    next_btn.grid(row=2, column=2, padx=10, pady=208, sticky=S+E)
-    prev_btn.grid(row=2, column=0, padx=12, pady=208, sticky=S+W)
-
-def rem_noon_viewer_btn():
-    next_btn.grid_forget()
-    prev_btn.grid_forget()
 
 # labels for Application Title
 title_label = Label(root, text="EDS DATA ANALYSIS TOOL", font=("Helvetica", 20))
@@ -344,13 +418,9 @@ file_btn.grid(row=0,column=0, padx=20, pady=20, sticky=W)
 file_entry = Entry(root, width=40)
 file_entry.grid(row=0, column=1, columnspan=2, padx=2, sticky=W)
 
-# label to display soiling rate
-sr_label = Label(root, text="Soiling Rate: "+soiling_rate+" %")
-sr_label.grid(row=2, column=0, columnspan=3, pady=209, sticky=S)
-
-# buttons for changing soiling rate in noon mode
-next_btn = Button(root, text=">>", command=lambda: next(viewer))
-prev_btn = Button(root, text="<<", state=DISABLED, command=lambda: prev(viewer))
+# button to display soiling rate values
+sr_btn = Button(root, text="Get Soiling Rate", command=show_sr)
+sr_btn.grid(row=2, column=0, columnspan=3, pady=209, sticky=S)
 
 # create label for output path
 out_btn = Button(root, text="Select Output Location", command=select_output, borderwidth=2, relief="raised")
