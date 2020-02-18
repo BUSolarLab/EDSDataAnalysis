@@ -229,28 +229,63 @@ def plot_table():
         for x in cols:
             for y in df[x]:
                 data[x].append(y)
+        # get the dates for x axis
+        dates = ()
+        for x in df['Date']:
+            x = x.replace("/2020", "")
+            dates = dates + (x,)
         # plot the data (x,y)
+        plt.figure(figsize=(12, 6))
         if plot_mode.get() == 'Isc':
-            plt.figure()
-            plt.scatter(range(len(data['SCC_Before(A)'])),data['SCC_Before(A)'])
-            plt.scatter(range(len(data['SCC_After(A)'])),data['SCC_After(A)'])
-            plt.show()
+            # plot a scatter plot
+            plt.scatter(range(len(data['SCC_Before(A)'])),data['SCC_Before(A)'], label="Pre EDS")
+            plt.scatter(range(len(data['SCC_After(A)'])),data['SCC_After(A)'], label="Post EDS")
+            # add the plot title
+            plt.title("Manual Mode - Isc(A)")
+            # add the legend
+            plt.legend(loc='upper right')
+            # add axis limits
+            x1,x2,y1,y2 = plt.axis()
+            plt.axis([x1, x2, 0, 10])
+            plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'Power':
-            plt.figure()
-            plt.scatter(range(len(data['EDS_PWR_Before(W)'])),data['EDS_PWR_Before(W)'])
-            plt.scatter(range(len(data['EDS_PWR_After(W)'])),data['EDS_PWR_After(W)'])
-            plt.show()
+            # plot a scatter plot
+            plt.scatter(range(len(data['EDS_PWR_Before(W)'])), data['EDS_PWR_Before(W)'], label="Pre EDS")
+            plt.scatter(range(len(data['EDS_PWR_Before(W)'])), data['EDS_PWR_After(W)'], label = "Post EDS")
+            # add the plot title
+            plt.title("Manual Mode - Power(W)")
+            # add the legend
+            plt.legend(loc='upper right')
+            # add axis limits
+            x1,x2,y1,y2 = plt.axis()
+            plt.axis([x1, x2, 0, 50])
+            plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'PR':
-            plt.figure()
-            plt.scatter(range(len(data['EDS_PR_Before'])),data['EDS_PR_Before'])
-            plt.scatter(range(len(data['EDS_PR_After'])),data['EDS_PR_After'])
-            plt.show()
+            # plot a scatter plot
+            plt.scatter(range(len(data['EDS_PR_Before'])),data['EDS_PR_Before'], label="Pre EDS")
+            plt.scatter(range(len(data['EDS_PR_After'])),data['EDS_PR_After'], label="Post EDS")
+            # add the plot title
+            plt.title("Manual Mode - PR")
+            # add the legend
+            plt.legend(loc='upper right')
+            # add axis limits
+            x1,x2,y1,y2 = plt.axis()
+            plt.axis([x1, x2, -1, 100])
+            plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'SR':
-            plt.figure()
-            plt.scatter(range(len(data['EDS_SR_Before'])),data['EDS_SR_Before'])
-            plt.scatter(range(len(data['EDS_SR_After'])),data['EDS_SR_After'])
-            plt.show()
-
+            # plot a scatter plot
+            plt.scatter(range(len(data['EDS_SR_Before'])),data['EDS_SR_Before'], label="Pre EDS")
+            plt.scatter(range(len(data['EDS_SR_After'])),data['EDS_SR_After'], label="Post EDS")
+            # add the plot title
+            plt.title("Manual Mode - SR")
+            # add the legend
+            plt.legend(loc='upper right')
+            # add axis limits
+            x1,x2,y1,y2 = plt.axis()
+            plt.axis([x1, x2, -1, 100])
+            plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
+        #show the plot
+        plt.show()
     elif mode == "noon_data.csv":
         # get the file location and declare constants
         output = output_loc+"/noon_sorted.csv"
@@ -348,42 +383,82 @@ def plot_table():
                 elif counter == 13:
                     data['CTRL2'][x][1].append(y)
                     counter = 0
+        # get the dates for x axis
+        dates = ()
+        date_counter = 0
+        for x in df['Date']:
+            if date_counter == 13:
+                x = x.replace("/2020", "")
+                dates = dates + (x,)
+                date_counter = 0
+            else:
+                date_counter += 1
         # plot the data
         plt.figure(figsize=(12, 6))
         panels = ['EDS1', 'EDS2', 'EDS3', 'EDS4', 'EDS5', 'CTRL1', 'CTRL2']
         if plot_mode.get() == 'Isc':
             counter = 0
             for x in range(7):
-                plt.subplot(4,2,x+1)
-                plt.title(panels[x] + " - Isc(A)")
-                plt.scatter(range(len(data[panels[x]]['SCC(A)'][0])),data[panels[x]]['SCC(A)'][0])
-                plt.scatter(range(len(data[panels[x]]['SCC(A)'][1])),data[panels[x]]['SCC(A)'][1])
-            plt.tight_layout(1)
-            plt.show()
+                # add subplot
+                plt.subplot(2,4,x+1)
+                # add title
+                plt.title("Noon Mode " + panels[x] + " - Isc(A)")
+                # add scatter plots
+                plt.scatter(range(len(data[panels[x]]['SCC(A)'][0])),data[panels[x]]['SCC(A)'][0], label="Pre EDS")
+                plt.scatter(range(len(data[panels[x]]['SCC(A)'][1])),data[panels[x]]['SCC(A)'][1], label="Post EDS")
+                # add the legend
+                plt.legend(loc='upper right')
+                # add axis limits
+                x1,x2,y1,y2 = plt.axis()
+                plt.axis([x1, x2, 0, 10])
+                plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'Power':
             for x in range(7):
+                # add subplot
                 plt.subplot(2,4,x+1)
-                plt.title(panels[x] + " - Power(W)")
-                plt.scatter(range(len(data[panels[x]]['Power(W)'][0])),data[panels[x]]['Power(W)'][0])
-                plt.scatter(range(len(data[panels[x]]['Power(W)'][1])),data[panels[x]]['Power(W)'][1])
-            plt.tight_layout(1)
-            plt.show()
+                # add title
+                plt.title("Noon Mode " + panels[x] + " - Power(W)")
+                # add scater plots
+                plt.scatter(range(len(data[panels[x]]['Power(W)'][0])),data[panels[x]]['Power(W)'][0], label="Pre EDS")
+                plt.scatter(range(len(data[panels[x]]['Power(W)'][1])),data[panels[x]]['Power(W)'][1], label="Post EDS")
+                # add the legend
+                plt.legend(loc='upper right')
+                # add axis limits
+                x1,x2,y1,y2 = plt.axis()
+                plt.axis([x1, x2, 0, 50])
+                plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'PR':
             for x in range(7):
-                plt.subplot(3,3,x+1)
-                plt.title(panels[x] + " - PR")
-                plt.scatter(range(len(data[panels[x]]['PR'][0])),data[panels[x]]['PR'][0])
-                plt.scatter(range(len(data[panels[x]]['PR'][1])),data[panels[x]]['PR'][1])
-            plt.tight_layout(1)
-            plt.show()
+                plt.subplot(2,4,x+1)
+                # add title
+                plt.title("Noon Mode "+ panels[x] + " - PR")
+                # add scatter plots
+                plt.scatter(range(len(data[panels[x]]['PR'][0])),data[panels[x]]['PR'][0], label="Pre EDS")
+                plt.scatter(range(len(data[panels[x]]['PR'][1])),data[panels[x]]['PR'][1], label="Post EDS")
+                # add the legend
+                plt.legend(loc='upper right')
+                # add axis limits
+                x1,x2,y1,y2 = plt.axis()
+                plt.axis([x1, x2, -1, 100])
+                plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
         elif plot_mode.get() == 'SR':
             for x in range(7):
-                plt.subplot(3,3,x+1)
-                plt.title(panels[x] + " - SR")
-                plt.scatter(range(len(data[panels[x]]['SR'][0])),data[panels[x]]['SR'][0])
-                plt.scatter(range(len(data[panels[x]]['SR'][1])),data[panels[x]]['SR'][1])
-            plt.tight_layout(1)
-            plt.show()
+                # add subplot
+                plt.subplot(2,4,x+1)
+                # add title
+                plt.title("Noon Mode "+ panels[x] + " - SR")
+                # add scatter plots
+                plt.scatter(range(len(data[panels[x]]['SR'][0])),data[panels[x]]['SR'][0], label="Pre EDS")
+                plt.scatter(range(len(data[panels[x]]['SR'][1])),data[panels[x]]['SR'][1], label="Post EDS")
+                # add the legend
+                plt.legend(loc='upper right')
+                # add axis limits
+                x1,x2,y1,y2 = plt.axis()
+                plt.axis([x1, x2, -1, 100])
+                plt.xticks(np.arange(0, x2, 1), dates, fontsize=8, rotation=80)
+        #show the plot
+        plt.tight_layout(1)
+        plt.show()
     elif mode == "testing_data.csv":
         # error message since no plotting for testing data
         error_label.config(text="Error! No Plotting Feature for Testing Data")

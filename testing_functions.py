@@ -156,6 +156,9 @@ def sort_data(name, eds_cols, window):
 def get_avg_testing_data(cols_list, window):
     # read the noon_data csv file
     df = read_data("./testing_data.csv")
+    # check if window is 1 day
+    if window == 1:
+        return df
     # declare new dictionary for avg data
     eds_cols = {}
     # sort the date
