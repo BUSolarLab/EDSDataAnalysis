@@ -355,6 +355,7 @@ def plot_table():
             counter = 0
             for x in range(7):
                 plt.subplot(4,2,x+1)
+                plt.title(panels[x] + " - Isc(A)")
                 plt.scatter(range(len(data[panels[x]]['SCC(A)'][0])),data[panels[x]]['SCC(A)'][0])
                 plt.scatter(range(len(data[panels[x]]['SCC(A)'][1])),data[panels[x]]['SCC(A)'][1])
             plt.tight_layout(1)
@@ -362,6 +363,7 @@ def plot_table():
         elif plot_mode.get() == 'Power':
             for x in range(7):
                 plt.subplot(2,4,x+1)
+                plt.title(panels[x] + " - Power(W)")
                 plt.scatter(range(len(data[panels[x]]['Power(W)'][0])),data[panels[x]]['Power(W)'][0])
                 plt.scatter(range(len(data[panels[x]]['Power(W)'][1])),data[panels[x]]['Power(W)'][1])
             plt.tight_layout(1)
@@ -369,6 +371,7 @@ def plot_table():
         elif plot_mode.get() == 'PR':
             for x in range(7):
                 plt.subplot(3,3,x+1)
+                plt.title(panels[x] + " - PR")
                 plt.scatter(range(len(data[panels[x]]['PR'][0])),data[panels[x]]['PR'][0])
                 plt.scatter(range(len(data[panels[x]]['PR'][1])),data[panels[x]]['PR'][1])
             plt.tight_layout(1)
@@ -376,6 +379,7 @@ def plot_table():
         elif plot_mode.get() == 'SR':
             for x in range(7):
                 plt.subplot(3,3,x+1)
+                plt.title(panels[x] + " - SR")
                 plt.scatter(range(len(data[panels[x]]['SR'][0])),data[panels[x]]['SR'][0])
                 plt.scatter(range(len(data[panels[x]]['SR'][1])),data[panels[x]]['SR'][1])
             plt.tight_layout(1)
