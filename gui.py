@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 # global variables
 global soiling_rate
 soiling_rate = ""
+mode = ""
 
 # header constants for the csv files
 manual_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(V)', 'OCV_After(V)', 'SCC_Before(A)', 'SCC_After(A)', 'EDS_PWR_Before(W)', 'EDS_PWR_After(W)', 'EDS_PR_Before', 'EDS_PR_After', 'EDS_SR_Before', 'EDS_SR_After']
@@ -23,7 +24,7 @@ testing_cols_list = ['Temperature(C)', 'Humidity(%)', 'GPOA(W/M2)', 'OCV_Before(
 
 root = Tk()
 root.title("EDS Data Analysis Tool")
-root.geometry("960x455")
+root.geometry("1000x455")
 
 # function to clear the mode buttons
 def clear_mode_buttons():
@@ -101,6 +102,12 @@ def show_sr():
         message = eds1 + '\n' + eds2 + '\n' + eds3 + '\n' + eds4 + '\n' + eds5 + '\n' + ctrl1 + '\n' + ctrl2
         # display the message
         sr_contents = Label(sr_window, text=message).pack()
+    elif mode == 'testing_data.csv':
+        #display error in the new window
+        error_msg = Label(sr_window, text="No SR measurement for this mode", fg = 'red').pack()
+    else:
+        #display error in the new window
+        error_msg = Label(sr_window, text="Please Select Valid CSV File For Analysis", fg = 'red').pack()
 
 # function to calculate the soiling rate of the table's data
 def calc_soiling_rate(mode):
@@ -174,6 +181,23 @@ def calc_soiling_rate(mode):
     elif mode == 'testing_data.csv':
         # update the soiling rate value
         sr_label.config(text= "Soiling Rate: N/A (This mode does not measure SR)")
+    else:
+        # return error
+        error_label.config(text="Select Valid CSV File For Analysis")
+
+# error check the average day entry field
+def avg_entry_check(window):
+    if window == '':
+        error_label.config(text="Please fill in the average days entry field")
+        return False
+    elif window.isalpha():
+        error_label.config(text="Please input a valid number in the average days entry field")
+        return False
+    elif int(window) <= 0:
+        error_label.config(text="Please input a valid number in the average days entry field")
+        return False
+    else:
+        return True
 
 # function to update the table
 def get_table():
@@ -182,27 +206,30 @@ def get_table():
     # get the average day number
     global window
     window = avg_entry.get()
-    # check which mode selected
-    if mode == 'manual_data.csv':
-        man_df = get_avg_manual_data(manual_cols_list, int(window))
-        output = output_loc+"/manual_sorted.csv"
-        x = man_df.to_csv(output)
-        # upload csv to the table
-        table.importCSV(output)
-    elif mode == "noon_data.csv":
-        man_df = get_avg_noon_data(noon_cols_list, int(window))
-        output = output_loc+"/noon_sorted.csv"
-        x = man_df.to_csv(output)
-        # upload csv to the table
-        table.importCSV(output)
-    elif mode == "testing_data.csv":
-        man_df = get_avg_testing_data(testing_cols_list, int(window))
-        output = output_loc+"/testing_sorted.csv"
-        x = man_df.to_csv(output)
-        # upload csv to the table
-        table.importCSV(output)
-    # clear the entry field
-    #avg_entry.delete(0, END)
+    # error check the window variable
+    avg_check = avg_entry_check(window)
+    if avg_check:
+        # check which mode selected
+        if mode == 'manual_data.csv':
+            man_df = get_avg_manual_data(manual_cols_list, int(window))
+            output = output_loc+"/manual_sorted.csv"
+            x = man_df.to_csv(output)
+            # upload csv to the table
+            table.importCSV(output)
+        elif mode == "noon_data.csv":
+            man_df = get_avg_noon_data(noon_cols_list, int(window))
+            output = output_loc+"/noon_sorted.csv"
+            x = man_df.to_csv(output)
+            # upload csv to the table
+            table.importCSV(output)
+        elif mode == "testing_data.csv":
+            man_df = get_avg_testing_data(testing_cols_list, int(window))
+            output = output_loc+"/testing_sorted.csv"
+            x = man_df.to_csv(output)
+            # upload csv to the table
+            table.importCSV(output)
+        else:
+            error_label.config(text="Select Valid CSV File For Analysis!")
 
 # plot the table
 def plot_table():
@@ -461,7 +488,9 @@ def plot_table():
         plt.show()
     elif mode == "testing_data.csv":
         # error message since no plotting for testing data
-        error_label.config(text="Error! No Plotting Feature for Testing Data")
+        error_label.config(text="No Plotting Feature for Testing Data")
+    else:
+        error_label.config(text="Select Valid CSV File For Analysis")
 
 # labels for Application Title
 title_label = Label(root, text="EDS DATA ANALYSIS TOOL", font=("Helvetica", 20))
