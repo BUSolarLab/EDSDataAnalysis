@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 class manual_mode:
     def __init__(self):
         # global variables
-        self.df = pd.read_csv("./manual_data.csv")
+        self.df = pd.read_csv("./inputs/manual_data.csv")
     
     # read the csv data file
     def read_data(self):
@@ -166,7 +166,7 @@ class manual_mode:
 class noon_mode:
     def __init__(self):
         # global variables
-        self.df = pd.read_csv("./noon_data.csv")
+        self.df = pd.read_csv("./inputs/noon_data.csv")
     
     # read the csv file
     def read_data(self):
@@ -394,7 +394,7 @@ class noon_mode:
 class testing_mode:
     def __init__(self):
         # global variables
-        self.df = pd.read_csv("./testing_data.csv")
+        self.df = pd.read_csv("./inputs/testing_data.csv")
     
     # read the data of the csv file
     def read_data(self):
@@ -506,7 +506,7 @@ class testing_mode:
     # sort the metric data from the csv file
     def sort_data(self,name, eds_cols, window):
         # declare initial variables
-        col_name = name #'Temperature(C)'
+        col_name = name
         counter = 0
         index_counter = 0
         data = [0,0,0,0,0]
@@ -561,7 +561,6 @@ class testing_mode:
 class EDS:
     '''INSTANTIATION'''
     def __init__(self, root, manual, noon, testing):
-        '''INITIALIZATION'''
         # initialize the application
         self.root = root
         self.root.title("EDS Data Analysis Tool")
@@ -707,22 +706,32 @@ class EDS:
         self.sr_title = Label(self.sr_window, text="Soiling Rate Values:", font=("Arial", 15)).pack()
         if self.mode ==  'manual_data.csv':
             pre,post = self.calc_soiling_rate(self.mode)
-            message = "EDS1 Soiling Rate: " + pre + "%(PRE), " + post + "%(POST)"
-            sr_contents = Label(self.sr_window, text=message).pack()
+            # error check the calculation
+            if pre == "error":
+                #display error in the new window
+                self.error_msg = Label(self.sr_window, text="Please enter a valid avg day entry for analysis", fg = 'red').pack()
+            else:
+                message = "EDS1 Soiling Rate: " + pre + "%(PRE), " + post + "%(POST)"
+                sr_contents = Label(self.sr_window, text=message).pack()
         elif self.mode == 'noon_data.csv':
             labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
             data = self.calc_soiling_rate(self.mode)
-            # prepare the label message
-            eds1 = "EDS1 Soiling Rate: " + str(data['EDS1_PRE']) + "%(PRE), " + str(data['EDS1_POST']) + "%(POST)"
-            eds2 = "EDS2 Soiling Rate: " + str(data['EDS2_PRE']) + "%(PRE), " + str(data['EDS2_POST']) + "%(POST)"
-            eds3 = "EDS3 Soiling Rate: " + str(data['EDS3_PRE']) + "%(PRE), " + str(data['EDS3_POST']) + "%(POST)"
-            eds4 = "EDS4 Soiling Rate: " + str(data['EDS4_PRE']) + "%(PRE), " + str(data['EDS4_POST']) + "%(POST)"
-            eds5 = "EDS5 Soiling Rate: " + str(data['EDS5_PRE']) + "%(PRE), " + str(data['EDS5_POST']) + "%(POST)"
-            ctrl1 = "CTRL1 Soiling Rate: " + str(data['CTRL1_PRE']) + "%(PRE), " + str(data['CTRL1_POST']) + "%(POST)"
-            ctrl2 = "CTRL2 Soiling Rate: " + str(data['CTRL2_PRE']) + "%(PRE), " + str(data['CTRL2_POST']) + "%(POST)"
-            message = eds1 + '\n' + eds2 + '\n' + eds3 + '\n' + eds4 + '\n' + eds5 + '\n' + ctrl1 + '\n' + ctrl2
-            # display the message
-            sr_contents = Label(self.sr_window, text=message).pack()
+            # error check the calculation
+            if data == "error":
+                #display error in the new window
+                self.error_msg = Label(self.sr_window, text="Please enter a valid avg day entry for analysis", fg = 'red').pack()
+            else:
+                # prepare the label message
+                eds1 = "EDS1 Soiling Rate: " + str(data['EDS1_PRE']) + "%(PRE), " + str(data['EDS1_POST']) + "%(POST)"
+                eds2 = "EDS2 Soiling Rate: " + str(data['EDS2_PRE']) + "%(PRE), " + str(data['EDS2_POST']) + "%(POST)"
+                eds3 = "EDS3 Soiling Rate: " + str(data['EDS3_PRE']) + "%(PRE), " + str(data['EDS3_POST']) + "%(POST)"
+                eds4 = "EDS4 Soiling Rate: " + str(data['EDS4_PRE']) + "%(PRE), " + str(data['EDS4_POST']) + "%(POST)"
+                eds5 = "EDS5 Soiling Rate: " + str(data['EDS5_PRE']) + "%(PRE), " + str(data['EDS5_POST']) + "%(POST)"
+                ctrl1 = "CTRL1 Soiling Rate: " + str(data['CTRL1_PRE']) + "%(PRE), " + str(data['CTRL1_POST']) + "%(POST)"
+                ctrl2 = "CTRL2 Soiling Rate: " + str(data['CTRL2_PRE']) + "%(PRE), " + str(data['CTRL2_POST']) + "%(POST)"
+                message = eds1 + '\n' + eds2 + '\n' + eds3 + '\n' + eds4 + '\n' + eds5 + '\n' + ctrl1 + '\n' + ctrl2
+                # display the message
+                sr_contents = Label(self.sr_window, text=message).pack()
         elif self.mode == 'testing_data.csv':
             #display error in the new window
             self.error_msg = Label(self.sr_window, text="No SR measurement for this mode", fg = 'red').pack()
@@ -1062,6 +1071,11 @@ class EDS:
             # get the soiling ratio values
             sr_before = df['EDS_SR_Before']
             sr_after = df['EDS_SR_After']
+            # error check the data if it can be computed for soiling rate
+            if len(sr_before) == 0:
+                return ("error", "error")
+            elif len(sr_before) == 1:
+                return ("error", "error")
             # calculate the soiling rate values
             soiling_rate_before = stats.theilslopes(sr_before, range(len(sr_before)), 0.90)[0].round(2)
             soiling_rate_after = stats.theilslopes(sr_after, range(len(sr_after)), 0.90)[0].round(2)
@@ -1116,6 +1130,11 @@ class EDS:
                 'CTRL1_POST':0,
                 'CTRL2_POST':0,
             }
+            # error check the data to make sure it can compute soiling rate
+            if len(soiling_ratios['EDS1_PRE'])==0:
+                return "error"
+            elif len(soiling_ratios['EDS1_PRE'])==1:
+                return "error"
             # calculate the soiling rate values
             for y in labels:
                 soiling_rates[y] = stats.theilslopes(soiling_ratios[y], range(len(soiling_ratios[y])), 0.90)[0].round(2)
