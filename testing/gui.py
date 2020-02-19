@@ -2,7 +2,6 @@ from tkinter import *
 from scipy import stats
 from tkinter import filedialog
 from tkintertable import TableCanvas, TableModel
-import sqlite3
 import pandas as pd
 import numpy as np
 import math
