@@ -7,6 +7,9 @@ import numpy as np
 import math
 import datetime
 import matplotlib.pyplot as plt
+import os
+import idna
+import sys
 
 '''MANUAL MODE PARSING'''
 class manual_mode:
