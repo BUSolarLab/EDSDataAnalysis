@@ -8,10 +8,9 @@ import math
 import datetime
 import matplotlib.pyplot as plt
 
-# manual mode parsing 
+'''MANUAL MODE PARSING'''
 class manual_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/manual_data.csv")
     
     # read the csv data file
@@ -104,7 +103,7 @@ class manual_mode:
         # go through the labels column of the noon data csv file
         for x in self.df[col_name]:
             if counter == window-1:
-                # append EDS number
+                # append EDS number 1 since manual mode is EDS1 only
                 new_col[col_name].append("1")
                 # reset counter
                 counter = 0
@@ -114,7 +113,7 @@ class manual_mode:
         eds_cols.update(new_col)
         return eds_cols
 
-    # sort the metric data in the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self, name, eds_cols, window):
         # declare initial variables
         col_name = name
@@ -162,10 +161,9 @@ class manual_mode:
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
 
-# noon mode parsing
+'''NOON MODE PARSING'''
 class noon_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/noon_data.csv")
     
     # read the csv file
@@ -318,7 +316,7 @@ class noon_mode:
         eds_cols.update(new_col2)
         return eds_cols
     
-    # sort the metric data from the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self,name, eds_cols, window):
         # declare initial variables
         col_name = name #'Temperature(C)'
@@ -390,10 +388,10 @@ class noon_mode:
         # create new dataframe
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
-# noon mode parsing
+
+'''TESTING MODE PARSING'''
 class testing_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/testing_data.csv")
     
     # read the data of the csv file
@@ -409,6 +407,7 @@ class testing_mode:
                 i = i + 1
         table = self.df[0:i]
         return table
+    
     # sort the date column of this csv file
     def sort_dates(self,eds_cols, window):
         # declare initial variables
@@ -503,7 +502,7 @@ class testing_mode:
         eds_cols.update(new_col2)
         return eds_cols
     
-    # sort the metric data from the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self,name, eds_cols, window):
         # declare initial variables
         col_name = name
@@ -557,14 +556,14 @@ class testing_mode:
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
 
-# main class for the GUI
+'''MAIN GUI CLASS FOR EDS ANALYSIS'''
 class EDS:
     '''INSTANTIATION'''
     def __init__(self, root, manual, noon, testing):
         # initialize the application
         self.root = root
         self.root.title("EDS Data Analysis Tool")
-        self.root.geometry("1000x455")
+        self.root.geometry("1050x550")
 
         '''OTHER CLASSES'''
         # instantiate other classes to parse the csv files
@@ -625,45 +624,45 @@ class EDS:
 
         # button to display soiling rate values
         self.sr_btn = Button(root, text="Get Soiling Rate", command= self.show_sr)
-        self.sr_btn.grid(row=2, column=0, columnspan=3, pady=209, sticky=S)
+        self.sr_btn.grid(row=2, column=0, columnspan=3, pady=135, sticky=S)
 
         # create label for getting output path
         self.out_btn = Button(root, text="Select Output Location", command= self.select_output, borderwidth=2, relief="raised")
-        self.out_btn.grid(row=2, column=0, padx=20, pady=177,sticky=S+W)
+        self.out_btn.grid(row=2, column=0, padx=20, pady=98,sticky=S+W)
 
         # create button to update the table
-        self.table_btn = Button(root, text="Get Table", command= self.get_table, font=("Arial", 14),borderwidth=1.4, relief="solid", width=18, height=3)
+        self.table_btn = Button(root, text="Get Table", command= self.get_table, font=("Arial", 14),borderwidth=1.4, relief="solid", width=15, height=3)
         self.table_btn.grid(row=2, column=3, padx=10, pady=60, sticky=N+W)
 
         # create button to plot the table
-        self.plot_btn = Button(root, text="Plot Table", command= self.plot_table, font=("Arial", 14),borderwidth=1.4, relief="solid", width=18, height=3)
+        self.plot_btn = Button(root, text="Plot Table", command= self.plot_table, font=("Arial", 14),borderwidth=1.4, relief="solid", width=15, height=3)
         self.plot_btn.grid(row=2, column=3, padx=200, pady=60, sticky=N)
 
         '''ENTRY FIELDS'''
         # entry field to display path for data csv file
-        self.file_entry = Entry(root, width=40)
+        self.file_entry = Entry(root, width=55)
         self.file_entry.grid(row=0, column=1, columnspan=2, padx=2, sticky=W)
 
         # entry field for the output path
-        self.out_entry = Entry(root, width=40)
-        self.out_entry.grid(row=2, column=1, columnspan=2, padx=5,pady=175, sticky=S+W)
+        self.out_entry = Entry(root, width=55)
+        self.out_entry.grid(row=2, column=1, columnspan=2, padx=5,pady=100, sticky=S+W)
 
         # entry field for average day input
-        self.avg_entry = Entry(root, width= 25)
-        self.avg_entry.grid(row=2, column=3,padx=120, pady=19, sticky=N+W)
+        self.avg_entry = Entry(root, width= 35)
+        self.avg_entry.grid(row=2, column=3,padx=150, pady=25, sticky=N+W)
 
         '''RADIO BUTTON'''
         # create radio button for selecting which plot
         self.plot_mode = StringVar()
         self.plot_mode.set("Power")
         self.radio_btn1 = Radiobutton(root, text="Isc", variable=self.plot_mode, value="Isc")
-        self.radio_btn1.grid(row=2, column=3, sticky=N+W, pady=120, padx=200)
+        self.radio_btn1.grid(row=2, column=3, sticky=N+W, pady=150, padx=260)
         self.radio_btn2 = Radiobutton(root, text="Power", variable=self.plot_mode, value="Power")
-        self.radio_btn2.grid(row=2, column=3, sticky=N+W, pady=150, padx=200)
+        self.radio_btn2.grid(row=2, column=3, sticky=N+W, pady=180, padx=260)
         self.radio_btn3 = Radiobutton(root, text="PR", variable=self.plot_mode, value="PR")
-        self.radio_btn3.grid(row=2, column=3, sticky=N+W, pady=180, padx=200)
+        self.radio_btn3.grid(row=2, column=3, sticky=N+W, pady=210, padx=260)
         self.radio_btn4 = Radiobutton(root, text="SR", variable=self.plot_mode, value="SR")
-        self.radio_btn4.grid(row=2, column=3, sticky=N+W, pady=210, padx=200)
+        self.radio_btn4.grid(row=2, column=3, sticky=N+W, pady=240, padx=260)
 
         '''FRAME'''
         # create frame for the table
@@ -714,7 +713,6 @@ class EDS:
                 message = "EDS1 Soiling Rate: " + pre + "%(PRE), " + post + "%(POST)"
                 sr_contents = Label(self.sr_window, text=message).pack()
         elif self.mode == 'noon_data.csv':
-            labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
             data = self.calc_soiling_rate(self.mode)
             # error check the calculation
             if data == "error":

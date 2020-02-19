@@ -8,10 +8,9 @@ import math
 import datetime
 import matplotlib.pyplot as plt
 
-# manual mode parsing 
+'''MANUAL MODE PARSING'''
 class manual_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/manual_data.csv")
     
     # read the csv data file
@@ -104,7 +103,7 @@ class manual_mode:
         # go through the labels column of the noon data csv file
         for x in self.df[col_name]:
             if counter == window-1:
-                # append EDS number
+                # append EDS number 1 since manual mode is EDS1 only
                 new_col[col_name].append("1")
                 # reset counter
                 counter = 0
@@ -114,7 +113,7 @@ class manual_mode:
         eds_cols.update(new_col)
         return eds_cols
 
-    # sort the metric data in the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self, name, eds_cols, window):
         # declare initial variables
         col_name = name
@@ -162,10 +161,9 @@ class manual_mode:
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
 
-# noon mode parsing
+'''NOON MODE PARSING'''
 class noon_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/noon_data.csv")
     
     # read the csv file
@@ -318,7 +316,7 @@ class noon_mode:
         eds_cols.update(new_col2)
         return eds_cols
     
-    # sort the metric data from the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self,name, eds_cols, window):
         # declare initial variables
         col_name = name #'Temperature(C)'
@@ -390,10 +388,10 @@ class noon_mode:
         # create new dataframe
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
-# noon mode parsing
+
+'''TESTING MODE PARSING'''
 class testing_mode:
     def __init__(self):
-        # global variables
         self.df = pd.read_csv("./inputs/testing_data.csv")
     
     # read the data of the csv file
@@ -409,6 +407,7 @@ class testing_mode:
                 i = i + 1
         table = self.df[0:i]
         return table
+    
     # sort the date column of this csv file
     def sort_dates(self,eds_cols, window):
         # declare initial variables
@@ -503,7 +502,7 @@ class testing_mode:
         eds_cols.update(new_col2)
         return eds_cols
     
-    # sort the metric data from the csv file
+    # sort the desired data from other columns from the csv file
     def sort_data(self,name, eds_cols, window):
         # declare initial variables
         col_name = name
@@ -557,7 +556,7 @@ class testing_mode:
         eds_df = pd.DataFrame(eds_cols)
         return eds_df
 
-# main class for the GUI
+'''MAIN GUI CLASS FOR EDS ANALYSIS'''
 class EDS:
     '''INSTANTIATION'''
     def __init__(self, root, manual, noon, testing):
@@ -714,7 +713,6 @@ class EDS:
                 message = "EDS1 Soiling Rate: " + pre + "%(PRE), " + post + "%(POST)"
                 sr_contents = Label(self.sr_window, text=message).pack()
         elif self.mode == 'noon_data.csv':
-            labels = ['EDS1_PRE', 'EDS2_PRE', 'EDS3_PRE', 'EDS4_PRE', 'EDS5_PRE', 'CTRL1_PRE', 'CTRL2_PRE','EDS1_POST','EDS2_POST','EDS3_POST','EDS4_POST','EDS5_POST','CTRL1_POST','CTRL2_POST']
             data = self.calc_soiling_rate(self.mode)
             # error check the calculation
             if data == "error":
