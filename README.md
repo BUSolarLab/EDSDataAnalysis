@@ -11,12 +11,15 @@ This GUI is made using tkinter, a python framework, which works on both Windows 
 
 ## Graphical User Interface
 GUI screen when it is booted
+
 ![86826159_214385013075973_1143762718776360960_n](https://user-images.githubusercontent.com/33497234/74899901-232dd100-536c-11ea-8acd-928b9398625a.png)
 
 Manipulating the data to get 7 day averages
+
 ![86729305_474804170063734_2277088357785796608_n](https://user-images.githubusercontent.com/33497234/74899929-35a80a80-536c-11ea-858a-e4c2c5afc144.png)
 
 Plotting PR for Noon Mode
+
 ![86858047_223091325767793_8387196493357907968_n](https://user-images.githubusercontent.com/33497234/74899815-e6fa7080-536b-11ea-8662-bd444576d47a.png)
 
 
