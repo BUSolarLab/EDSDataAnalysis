@@ -9,6 +9,9 @@ This project is a analytical tool to help analyze the data from the EDS Field Te
 
 This GUI is made using tkinter, a python framework, which works on both Windows or Mac. The GUI essentially allows the user to take average data calculations based on the desired number of days (since the FTU only takes daily data, and getting 2-day/weekly/monthly average data is highly desirable)
 
+## Graphical User Interface
+
+
 ## Getting Started
 1. Clone the github repository
 ```
