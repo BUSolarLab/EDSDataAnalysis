@@ -30,6 +30,9 @@ git clone https://github.com/BUSolarLab/EDSDataAnalysis.git
 ```
 2. Install Dependancies
 ```
+python -m pip install --upgrade pip
+```
+```
 pip install -r requirements.txt
 ```
 3. Run the desired script
