@@ -505,15 +505,62 @@ class EDS:
                 'CTRL2_POST':[],
             }
             # get the soiling ratio values
-            counter = 0
-            for x in df['SR_Before']: #fix sr calculation
-                if counter == 14:
-                    counter = 0
-                    soiling_ratios[labels[counter]].append(x)
-                    counter = counter + 1
-                else:
-                    soiling_ratios[labels[counter]].append(x)
-                    counter = counter + 1
+            data_SR = df[['EDS/CTRL(#)', 'SR_Before','SR_After']]
+            data_SR.set_index('EDS/CTRL(#)', inplace=True)
+            
+
+            EDS1 = data_SR.loc[['EDS1']]
+            EDS2 = data_SR.loc[['EDS2']]
+            EDS3 = data_SR.loc[['EDS3']]
+            EDS4 = data_SR.loc[['EDS4']]
+            EDS5 = data_SR.loc[['EDS5']]
+            CTRL1 = data_SR.loc[['CTRL1']]
+            CTRL2 = data_SR.loc[['CTRL2']]
+
+            #SR Before
+            EDS1_Pre = EDS1[['SR_Before']].values.flatten()
+            soiling_ratios['EDS1_PRE'].extend(EDS1_Pre)
+
+            EDS2_Pre = EDS2[['SR_Before']].values.flatten()
+            soiling_ratios['EDS2_PRE'].extend(EDS2_Pre)
+
+            EDS3_Pre = EDS3[['SR_Before']].values.flatten()
+            soiling_ratios['EDS3_PRE'].extend(EDS3_Pre)
+
+            EDS4_Pre = EDS4[['SR_Before']].values.flatten()
+            soiling_ratios['EDS4_PRE'].extend(EDS4_Pre)
+
+            EDS5_Pre = EDS5[['SR_Before']].values.flatten()
+            soiling_ratios['EDS5_PRE'].extend(EDS5_Pre)
+
+            CTRL1_Pre = CTRL1[['SR_Before']].values.flatten()
+            soiling_ratios['CTRL1_PRE'].extend(CTRL1_Pre)
+
+            CTRL2_Pre = CTRL2[['SR_Before']].values.flatten()
+            soiling_ratios['CTRL2_PRE'].extend(CTRL2_Pre)
+
+            #Sr After
+            EDS1_Post = EDS1[['SR_After']].values.flatten()
+            soiling_ratios['EDS1_POST'].extend(EDS1_Post)
+
+            EDS2_Post = EDS2[['SR_After']].values.flatten()
+            soiling_ratios['EDS2_POST'].extend(EDS2_Post)
+
+            EDS3_Post = EDS3[['SR_After']].values.flatten()
+            soiling_ratios['EDS3_POST'].extend(EDS3_Post)
+
+            EDS4_Post = EDS4[['SR_After']].values.flatten()
+            soiling_ratios['EDS4_POST'].extend(EDS4_Post)
+
+            EDS5_Post = EDS5[['SR_After']].values.flatten()
+            soiling_ratios['EDS5_POST'].extend(EDS5_Post)
+
+            CTRL1_Post = CTRL1[['SR_After']].values.flatten()
+            soiling_ratios['CTRL1_POST'].extend(CTRL1_Post)
+
+            CTRL2_Post = CTRL2[['SR_After']].values.flatten()
+            soiling_ratios['CTRL2_POST'].extend(CTRL2_Post)
+
             # declare soiling rate dictionary
             soiling_rates = {
                 'EDS1_PRE':0,
